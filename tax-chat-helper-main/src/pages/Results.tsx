@@ -86,50 +86,55 @@ const Results = () => {
     return null;
   }
 
-  /*const handleQuestion = () => {
-    if (!question.trim()) return;
-
-    const newMessages: Message[] = [
-      ...messages,
-      { role: "user", content: question }
-    ];
-
-    // Simple keyword-based response system
-    const response = Object.entries(TAX_FAQ).find(([key]) => 
-      question.toLowerCase().includes(key)
-    )?.[1] || "I'm sorry, I don't have specific information about that. Please try asking about tax saving, documents needed, or tax brackets.";
-
-    newMessages.push({ role: "assistant", content: response });
-    setMessages(newMessages);
-    setQuestion("");
-  }; */
   const handleQuestion = () => {
     if (!question.trim()) return;
   
-    const newMessages: Message[] = [
-      ...messages,
-      { role: "user", content: question }
-    ];
+    const newMessages: Message[] = [...messages, { role: "user", content: question }];
   
     let response = "";
+    const lowerCaseQuestion = question.toLowerCase();
   
-    // Handle specific queries
-    if (question.toLowerCase().includes("tax calculation")) {
-      response = "Sure! Please provide your total income and deductions (if any) so I can calculate your tax.";
-    } else if (question.toLowerCase().includes("income")) {
-      const income = parseFloat(question.replace(/[^0-9.]/g, ""));
-      if (!isNaN(income)) {
-        const tax = calculateTax(income);
-        response = `Based on your income of ${formatCurrency(income)}, your estimated tax liability is ${formatCurrency(tax)}.`;
-      } else {
-        response = "Please provide a valid income amount.";
-      }
-    } else {
-      // Default FAQ response
-      response = Object.entries(TAX_FAQ).find(([key]) =>
-        question.toLowerCase().includes(key)
-      )?.[1] || "I'm sorry, I don't have specific information about that. Please try asking about tax saving, documents needed, or tax brackets.";
-    }
+    // Predefined responses
+    const responses: { [key: string]: string } = {
+     "hi": "Hello! How can I assist you with your tax-related queries today?",
+        "hello": "Hi there! How can I help you with your taxes?",
+        "how do I calculate my income tax?": "To calculate your income tax, you need to consider your taxable income, applicable tax slabs, deductions, and exemptions. Would you like assistance with a specific tax year?",
+        "what are the tax slabs for this year?": "The tax slabs vary based on the tax regime you choose. Would you like details on the old tax regime or the new one?",
+        "how can I reduce my taxable income?": "You can reduce your taxable income through deductions like 80C (Investments), 80D (Health Insurance), HRA, and others. Would you like specific recommendations based on your income?",
+        "what is section 80C?": "Section 80C allows deductions up to ₹1.5 lakh on eligible investments like PPF, EPF, NSC, ELSS, and life insurance premiums. Do you need details on any specific investment?",
+        "how do I file my income tax return?": "You can file your ITR online through the income tax e-filing portal. Do you need step-by-step guidance?",
+        "what is Form 16?": "Form 16 is a TDS certificate issued by your employer that contains details of your salary, deductions, and tax paid. Would you like help understanding it?",
+        "what if I missed the ITR filing deadline?": "If you missed the deadline, you can file a belated return before the final due date with a late fee. Do you want to check the penalties applicable?",
+        "how can I claim an income tax refund?": "If you have paid excess tax, you can claim a refund while filing your ITR. It usually gets credited to your bank account within a few months. Need help checking your refund status?",
+        "what is advance tax?": "Advance tax is the tax paid in installments if your total tax liability exceeds ₹10,000. It is paid quarterly. Would you like to calculate your advance tax?",
+        "how do I check my TDS?": "You can check your TDS details in Form 26AS on the income tax portal. Would you like guidance on accessing it?",
+        "what is Form 26AS?": "Form 26AS is a consolidated statement of your tax credits, including TDS, advance tax, and self-assessment tax. Do you need help downloading it?",
+        "what is capital gains tax?": "Capital gains tax is levied on profits from the sale of assets like stocks, property, and gold. Do you need short-term or long-term capital gains tax details?",
+        "how do I save tax on capital gains?": "You can save tax by reinvesting in specified bonds, properties, or availing exemptions under sections like 54, 54F, and 54EC. Would you like detailed guidance?",
+        "is crypto taxable in India?": "Yes, gains from crypto trading are taxed at 30% plus 4% cess. Would you like help calculating your crypto tax?",
+        "what is GST?": "GST (Goods and Services Tax) is an indirect tax levied on goods and services. Would you like to check GST rates or GST return filing details?",
+        "how do I register for GST?": "You can register for GST on the GST portal. Would you like step-by-step assistance?",
+        "what is input tax credit (ITC)?": "Input tax credit allows businesses to reduce their GST liability by claiming credit for the tax paid on purchases. Do you want help understanding ITC claims?",
+        "how do I file GST returns?": "GST returns are filed on the GST portal. The frequency depends on your business category. Would you like help with GSTR-1, GSTR-3B, or any other return?",
+        "what is professional tax?": "Professional tax is a state-imposed tax on salaried employees and professionals. It varies by state. Would you like to check your state's professional tax rates?",
+        "how can freelancers save taxes?": "Freelancers can save tax by claiming deductions under 44ADA, business expenses, and investing in 80C options. Need help with specific deductions?",
+        "what is section 44ADA?": "Section 44ADA offers presumptive taxation for professionals, allowing them to declare 50% of their income as taxable. Need more details?",
+        "how do I pay self-assessment tax?": "You can pay self-assessment tax through the income tax portal using net banking or challan 280. Need assistance?",
+        "how do I check my income tax refund status?": "You can check your refund status on the income tax e-filing portal. Need step-by-step guidance?",
+        "what is tax audit?": "A tax audit is required if your business turnover exceeds the prescribed limits under section 44AB. Would you like to check if it applies to you?",
+        "how do I declare foreign income in ITR?": "Foreign income must be declared in ITR under relevant sections. Avoiding declaration may lead to penalties. Need help understanding DTAA?",
+        "what is DTAA?": "Double Taxation Avoidance Agreement (DTAA) prevents double taxation of income earned in two countries. Do you need help claiming tax relief under DTAA?",
+        "what is HRA exemption?": "House Rent Allowance (HRA) exemption can be claimed if you live in a rented house and receive HRA as part of your salary. Need help calculating it?",
+        "how do I claim home loan tax benefits?": "You can claim deductions under 80C (principal) and 24(b) (interest). Need help calculating your benefits?",
+        "how can I file taxes if I have multiple sources of income?": "All income sources must be declared in your ITR. Do you need help categorizing them correctly?",
+        "what are the penalties for tax evasion?": "Tax evasion penalties vary but can be severe, including fines and imprisonment. Would you like guidance on tax compliance?",
+        "what is presumptive taxation?": "Presumptive taxation allows small businesses and professionals to pay tax on a predefined percentage of income. Would you like to check eligibility?",
+        "how do I update my PAN details?": "You can update PAN details on the NSDL portal. Need assistance with the process?",
+        "how do I check my PAN-Aadhaar linking status?": "You can check the status on the income tax portal. Need step-by-step guidance?"
+    };
+    
+    // Check if question matches any predefined queries
+    response = Object.entries(responses).find(([key]) => lowerCaseQuestion.includes(key))?.[1] || "I'm still learning";
   
     newMessages.push({ role: "assistant", content: response });
     setMessages(newMessages);
