@@ -92,17 +92,17 @@ const Results = () => {
     const newMessages: Message[] = [...messages, { role: "user", content: question }];
   
     let response = "";
-    const lowerCaseQuestion = question.toLowerCase();
+    const lowerCaseQuestion = question.toLowerCase().trim();
   
-    // Predefined responses
+    // Predefined responses with keywords/synonyms
     const responses: { [key: string]: string } = {
-     "hi": "Hello! How can I assist you with your tax-related queries today?",
-        "hello": "Hi there! How can I help you with your taxes?",
-        "how do I calculate my income tax?": "To calculate your income tax, you need to consider your taxable income, applicable tax slabs, deductions, and exemptions. Would you like assistance with a specific tax year?",
-        "what are the tax slabs for this year?": "The tax slabs vary based on the tax regime you choose. Would you like details on the old tax regime or the new one?",
-        "how can I reduce my taxable income?": "You can reduce your taxable income through deductions like 80C (Investments), 80D (Health Insurance), HRA, and others. Would you like specific recommendations based on your income?",
-        "what is section 80C?": "Section 80C allows deductions up to ₹1.5 lakh on eligible investments like PPF, EPF, NSC, ELSS, and life insurance premiums. Do you need details on any specific investment?",
-        "how do I file my income tax return?": "You can file your ITR online through the income tax e-filing portal. Do you need step-by-step guidance?",
+      "hi": "Hello! How can I assist you with your tax-related queries today?",
+      "hello": "Hi there! How can I help you with your taxes?",
+      "how do i calculate my income tax?": "To calculate your income tax, you need to consider your taxable income, applicable tax slabs, deductions, and exemptions. Would you like assistance with a specific tax year?",
+      "what are the tax slabs for this year?": "The tax slabs vary based on the tax regime you choose. Would you like details on the old tax regime or the new one?",
+      "how can i reduce my taxable income?": "You can reduce your taxable income through deductions like 80C (Investments), 80D (Health Insurance), HRA, and others. Would you like specific recommendations based on your income?",
+      "what is section 80c?": "Section 80C allows deductions up to ₹1.5 lakh on eligible investments like PPF, EPF, NSC, ELSS, and life insurance premiums. Do you need details on any specific investment?",
+      "how do I file my income tax return?": "You can file your ITR online through the income tax e-filing portal. Do you need step-by-step guidance?",
         "what is Form 16?": "Form 16 is a TDS certificate issued by your employer that contains details of your salary, deductions, and tax paid. Would you like help understanding it?",
         "what if I missed the ITR filing deadline?": "If you missed the deadline, you can file a belated return before the final due date with a late fee. Do you want to check the penalties applicable?",
         "how can I claim an income tax refund?": "If you have paid excess tax, you can claim a refund while filing your ITR. It usually gets credited to your bank account within a few months. Need help checking your refund status?",
@@ -116,7 +116,7 @@ const Results = () => {
         "how do I register for GST?": "You can register for GST on the GST portal. Would you like step-by-step assistance?",
         "what is input tax credit (ITC)?": "Input tax credit allows businesses to reduce their GST liability by claiming credit for the tax paid on purchases. Do you want help understanding ITC claims?",
         "how do I file GST returns?": "GST returns are filed on the GST portal. The frequency depends on your business category. Would you like help with GSTR-1, GSTR-3B, or any other return?",
-        "what is professional tax?": "Professional tax is a state-imposed tax on salaried employees and professionals. It varies by state. Would you like to check your state's professional tax rates?",
+        "what is professional tax": "Professional tax is a state-imposed tax on salaried employees and professionals. It varies by state. Would you like to check your state's professional tax rates?",
         "how can freelancers save taxes?": "Freelancers can save tax by claiming deductions under 44ADA, business expenses, and investing in 80C options. Need help with specific deductions?",
         "what is section 44ADA?": "Section 44ADA offers presumptive taxation for professionals, allowing them to declare 50% of their income as taxable. Need more details?",
         "how do I pay self-assessment tax?": "You can pay self-assessment tax through the income tax portal using net banking or challan 280. Need assistance?",
@@ -132,15 +132,22 @@ const Results = () => {
         "how do I update my PAN details?": "You can update PAN details on the NSDL portal. Need assistance with the process?",
         "how do I check my PAN-Aadhaar linking status?": "You can check the status on the income tax portal. Need step-by-step guidance?"
     };
-    
-    // Check if question matches any predefined queries
-    response = Object.entries(responses).find(([key]) => lowerCaseQuestion.includes(key))?.[1] || "I'm still learning";
+
+    if (responses[lowerCaseQuestion]) {
+      response = responses[lowerCaseQuestion];
+    } else {
+      const matchedResponse = Object.entries(responses).find(([key]) => {
+        const keywords = key.split(" ");
+        return keywords.every((keyword) => lowerCaseQuestion.includes(keyword));
+      });
+  
+      response = matchedResponse?.[1] || "I'm still learning. Can you rephrase your question?";
+    }
   
     newMessages.push({ role: "assistant", content: response });
     setMessages(newMessages);
     setQuestion("");
   };
-
   const downloadPDF = async () => {
     if (!reportRef.current) return;
 
