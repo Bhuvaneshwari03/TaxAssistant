@@ -16,8 +16,11 @@ Tax Chat Helper is an AI-powered web application designed to simplify tax calcul
 
 # Installation
    git clone https://github.com/bhuvaneshwari03/TaxAssistant.git
+   
    cd TaxAssistant
+   
    npm install
+   
    npm start
 
 # Features
@@ -36,12 +39,13 @@ Tax Chat Helper is an AI-powered web application designed to simplify tax calcul
 # Installation
 1. Clone the repository:
       git clone https://github.com/bhuvaneshwari03/TaxAssistant.git
+   
       cd TaxChatHelper
    
-2. To install libraries:
+3. To install libraries:
       npm install 
 
-3. Run:
+4. Run:
       npm run dev
 
 # API Endpoints
@@ -49,7 +53,7 @@ Tax Chat Helper is an AI-powered web application designed to simplify tax calcul
   - Request: `{ "question": "What is my tax on 8 lakh income?" }`
   - Response: `{ "answer": "Your estimated tax is ₹XXXX" }`
 
-## Future Enhancements
+# Future Enhancements
 - Integration with government tax APIs for real-time updates.
 - More AI-powered financial planning features.
 - Mobile application version.
